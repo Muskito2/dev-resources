@@ -1,0 +1,18 @@
+// v0.3
+// Pour que le raccourci F5 commence le debug. IL FAUT COMPILER LES CHANGEMENTS AVANT DE LANCER LE DEBUG.
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug openFrameworks app",
+      "type": "cppvsdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/bin/main.exe",
+      "args": [],
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}/bin",
+      "environment": [],
+      "console": "externalTerminal"
+    }
+  ]
+}
