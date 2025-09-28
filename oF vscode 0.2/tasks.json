@@ -1,0 +1,175 @@
+// v0.2
+// Pour Visual Studio Bulding Tools (2022) et openFrameworks 12.1 avec la compilation en mode Debug (compilation MSVC) | IDE: VS Code
+
+// Installer le kit de development C++ de Microsoft: https://github.com/bycloudai/InstallVSBuildToolsWindows?tab=readme-ov-file
+// Peut aussi etre installé à partir de l'installateur de Visual Studio 2022
+
+// Mettre a jour settings.json (dans le dossier vscode) avec le chemin de son dossier openFrameworks
+
+// Ouvrir terminal x64 Native Tools Command Prompt for VS 2022, ferme VS Code et taper "code ."
+// pour ouvrir vs code qui pourra alors compiler avec MSVC
+
+// Avant de lancer la compilation ici, il faut compiler openFrameworks en utlisant
+//  x64 Native Tools Command Prompt for VS 2022. Pource faire
+// 1. Dans le terminal, aller au dossier ...\libs\openFrameworksCompiled\project\vs dans votre dossier openFrameworks
+// 2. Ensuite executer la commande: msbuild openFrameworksLib.vcxproj /p:Configuration=Debug /p:Platform=x64
+// Cela compile en mode debug et donne un fichier et chemin /libs/openFrameworksCompiled/lib/vs/x64/openframeworksLib_debug.lib
+// Note: Cela utilise un projet Visual Studio pour compiler automatiquement toute openFrameworks (excluant les addons)
+
+// Ensuite, il est possible de compiler et linké un projet openFrameworks dans VS Code
+// 
+// Ensuite faire a partir de Terminal - Run Build Task.. dans VS Code (il faut absolument avoir définit le bon chemin dans settings.json)
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+  "label": "Prepare Dirs",
+  "type": "shell",
+  "command": "mkdir build -Force"
+}
+,
+    {
+      "label": "Build openFrameworks app (Debug, MSVC)",
+      "type": "shell",
+      "command": "cl.exe",
+      "args": [
+        "/Zi",
+        "/EHsc",
+        "/MDd",   // Debug runtime
+        "/wd4551", // warning add on turned off
+        "/std:c++17",   // 👈 active C++17
+
+   // Include pour ofMain.h
+  "/I", "${config:OF_ROOT}/libs/openFrameworks",
+
+  // Chaque sous-lib nécessaire (include des sources)
+  "/I", "${config:OF_ROOT}/libs/openFrameworks/app",
+  "/I", "${config:OF_ROOT}/libs/openFrameworks/graphics",
+  "/I", "${config:OF_ROOT}/libs/openFrameworks/types",
+  "/I", "${config:OF_ROOT}/libs/openFrameworks/utils",
+  "/I", "${config:OF_ROOT}/libs/openFrameworks/events",
+  "/I", "${config:OF_ROOT}/libs/openFrameworks/sound",
+  "/I", "${config:OF_ROOT}/libs/openFrameworks/video",
+  "/I", "${config:OF_ROOT}/libs/openFrameworks/3d",
+  "/I", "${config:OF_ROOT}/libs/openFrameworks/gl",
+  "/I", "${config:OF_ROOT}/libs/openFrameworks/math",
+  "/I", "${config:OF_ROOT}/libs/openFrameworks/communication",
+
+  // Dossier addons (include ET fichiers à compiler)
+  // Les extensions doivent etre compiler pour chaque projet
+  // INCLUDE
+  "/I", "${config:OF_ROOT}/addons/ofxAssimpModelLoader/libs/assimp/include",
+  "/I", "${config:OF_ROOT}/addons/ofxGui/src",
+  //"/I", "${config:OF_ROOT}/addons/ofxAssimp/src",
+  //"/I", "${config:OF_ROOT}/addons/ofxAssimp/src/Source",
+  "/I", "${config:OF_ROOT}/addons/ofxAssimpModelLoader/src",
+
+  // COMPILE
+  "${config:OF_ROOT}/addons/ofxGui/src/*.cpp",
+  //"${config:OF_ROOT}/addons/ofxAssimp/src/*.cpp",
+  //"${config:OF_ROOT}/addons/ofxAssimp/src/Source/*.cpp",
+  "${config:OF_ROOT}/addons/ofxAssimpModelLoader/src/*.cpp",
+
+  // LINK
+  "${config:OF_ROOT}/addons/ofxAssimpModelLoader/libs/assimp/lib/vs/x64/Debug/libassimpD.lib",
+  // Fin des addons
+
+
+  // externals
+"/I", "${config:OF_ROOT}/libs/glew/include",
+"/I", "${config:OF_ROOT}/libs/glfw/include",
+"/I", "${config:OF_ROOT}/libs/freetype/include",
+"/I", "${config:OF_ROOT}/libs/freetype/include/freetype2",
+"/I", "${config:OF_ROOT}/libs/FreeImage/include",
+"/I", "${config:OF_ROOT}/libs/poco/include",
+"/I", "${config:OF_ROOT}/libs/tess2/include",
+"/I", "${config:OF_ROOT}/libs/glm/include",
+"/I", "${config:OF_ROOT}/libs/brotli/include",
+"/I", "${config:OF_ROOT}/libs/cairo/include",
+"/I", "${config:OF_ROOT}/libs/curl/include",
+"/I", "${config:OF_ROOT}/libs/fmt/include",
+"/I", "${config:OF_ROOT}/libs/json/include",
+"/I", "${config:OF_ROOT}/libs/libpng/include",
+"/I", "${config:OF_ROOT}/libs/openssl/include",
+"/I", "${config:OF_ROOT}/libs/pixman/include",
+"/I", "${config:OF_ROOT}/libs/pugixml/include",
+"/I", "${config:OF_ROOT}/libs/rtAudio/include",
+"/I", "${config:OF_ROOT}/libs/uriparser/include",
+"/I", "${config:OF_ROOT}/libs/utf8/include",
+"/I", "${config:OF_ROOT}/libs/videoinput/include",
+"/I", "${config:OF_ROOT}/libs/zlib/include",
+
+        "/Fo:${workspaceFolder}/build//",       // où vont les .obj
+        "/Fe:${workspaceFolder}/bin/main.exe", // dit où mettre le .exe
+        "${workspaceFolder}/src/*.cpp", // pour compiler son propre dossier src
+
+        // Link avec la lib debug
+        "${config:OF_ROOT}/libs/openFrameworksCompiled/lib/vs/x64/openframeworksLib_debug.lib",
+
+        "${config:OF_ROOT}/libs/glew/lib/vs/x64/libglew32.lib",
+        "${config:OF_ROOT}/libs/glfw/lib/vs/x64/glfw3.lib",
+        "${config:OF_ROOT}/libs/FreeImage/lib/vs/x64/FreeImageD.lib",
+        "${config:OF_ROOT}/libs/freetype/lib/vs/x64/freetyped.lib",
+        "${config:OF_ROOT}/libs/uriparser/lib/vs/x64/uriparser.lib",
+        "${config:OF_ROOT}/libs/curl/lib/vs/x64/libcurl.lib",
+        "${config:OF_ROOT}/libs/videoinput/lib/vs/x64/videoInputD.lib",
+        "${config:OF_ROOT}/libs/tess2/lib/vs/x64/tess2.lib",
+        "${config:OF_ROOT}/libs/rtAudio/lib/vs/x64/rtaudioD.lib",
+        "${config:OF_ROOT}/libs/libpng/lib/vs/x64/libpng.lib",
+        "${config:OF_ROOT}/libs/zlib/lib/vs/x64/zlib.lib",
+        "${config:OF_ROOT}/libs/brotli/lib/vs/x64/brotlidec.lib",
+        "${config:OF_ROOT}/libs/brotli/lib/vs/x64/brotlienc.lib",
+        "${config:OF_ROOT}/libs/brotli/lib/vs/x64/brotlicommon.lib",
+        "${config:OF_ROOT}/libs/openssl/lib/vs/x64/libssl.lib",
+        "${config:OF_ROOT}/libs/openssl/lib/vs/x64/libcrypto.lib",
+        "${config:OF_ROOT}/libs/cairo/lib/vs/x64/libcairo.lib",
+        "${config:OF_ROOT}/libs/pixman/lib/vs/x64/libpixman-1.lib",
+        "${config:OF_ROOT}/libs/pugixml/lib/vs/x64/pugixmlD.lib", // inclut deja dans Assimp lib
+
+        // System
+        "user32.lib",
+        "gdi32.lib",
+        "kernel32.lib",
+        "comdlg32.lib",
+        "advapi32.lib",
+        "ole32.lib",
+        "oleaut32.lib",
+        "shell32.lib",
+        "version.lib",
+        "winmm.lib",
+        "opengl32.lib",
+        "mfplat.lib",
+        "mf.lib",
+        "mfuuid.lib",
+        "mfreadwrite.lib",
+        "ws2_32.lib",
+        "crypt32.lib",
+        "wldap32.lib",
+        "dsound.lib",
+        "msimg32.lib",
+        "setupapi.lib",
+        "vfw32.lib",
+        "comctl32.lib",
+        "winspool.lib",
+        "uuid.lib",
+
+        "/link",
+        "/ignore:4099",
+        "/ignore:4098",
+        "/ignore:4006", // warning add on turned off
+        "/ignore:4088", // warning add on turned off
+        "/FORCE:MULTIPLE" // resoudre probleme addons
+
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}",
+      },
+      "problemMatcher": "$msCompile",
+      "dependsOn": "Prepare Dirs",
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    }
+  ]
+}

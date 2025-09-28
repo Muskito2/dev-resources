@@ -1,0 +1,8 @@
+// v0.2
+// OF_ROOT: le chemin du dossier openFrameworks sur son ordinateur
+{
+    "OF_ROOT": "C:/Users/antoi/dev/graphique/openFrameworks12.1",
+    "files.associations": {
+        "unordered_map": "cpp"
+    }
+}
